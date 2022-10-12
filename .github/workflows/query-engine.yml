@@ -7,11 +7,12 @@ jobs:
     container:
       image: prismagraphql/build:debian-libssl1.1.x
     steps:
-         - name: Build query-engine-node-api
-           run: |
-             rustup default stable
-             cargo build --release -p query-engine-node-api
-         - name: List Target
-           run: |
-             ls -lh target/release/
-
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Build query-engine-node-api
+        run: |
+          rustup default stable
+          cargo build --release -p query-engine-node-api
+      - name: List Target
+        run: |
+          ls -lh target/release/
