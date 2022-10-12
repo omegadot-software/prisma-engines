@@ -7,8 +7,10 @@ jobs:
     container:
       image: prismagraphql/build:debian-libssl1.1.x
     steps:
-         - name: Log the OS version
+         - name: Build query-engine-node-api
            run: |
-             cat /etc/os-release  
-
+             cargo build --release -p query-engine-node-api
+         - name: List Target
+           run: |
+             ls -lh target/release/
 
