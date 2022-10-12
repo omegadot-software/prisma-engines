@@ -44,3 +44,7 @@ query-engine-metrics = {path = "../metrics"}
 
 [build-dependencies]
 napi-build = "1"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+lto = true

@@ -21,14 +21,14 @@ pub async fn load(
     url: &str,
 ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider {
-        p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
-        p if MYSQL.is_provider(p) => mysql(source, url, features).await,
+        // p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
+        // p if MYSQL.is_provider(p) => mysql(source, url, features).await,
         p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
-        p if MSSQL.is_provider(p) => mssql(source, url, features).await,
-        p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
+        // p if MSSQL.is_provider(p) => mssql(source, url, features).await,
+        // p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
 
-        #[cfg(feature = "mongodb")]
-        p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
+        // #[cfg(feature = "mongodb")]
+        // p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
 
         x => Err(CoreError::ConfigurationError(format!(
             "Unsupported connector type: {}",
@@ -39,20 +39,20 @@ pub async fn load(
 
 pub fn db_name(source: &Datasource, url: &str) -> crate::Result<String> {
     match source.active_provider {
-        p if SQLITE.is_provider(p) => Ok(DEFAULT_SQLITE_DB_NAME.to_string()),
-        p if MYSQL.is_provider(p) => {
-            let url = Url::parse(url)?;
-            let err_str = "No database found in connection string";
-
-            let mut db_name = url
-                .path_segments()
-                .ok_or_else(|| CoreError::ConfigurationError(err_str.into()))?;
-
-            let db_name = db_name.next().expect(err_str).to_owned();
-
-            Ok(db_name)
-        }
-        p if POSTGRES.is_provider(p) | COCKROACH.is_provider(p) => {
+        // p if SQLITE.is_provider(p) => Ok(DEFAULT_SQLITE_DB_NAME.to_string()),
+        // p if MYSQL.is_provider(p) => {
+        //     let url = Url::parse(url)?;
+        //     let err_str = "No database found in connection string";
+        //
+        //     let mut db_name = url
+        //         .path_segments()
+        //         .ok_or_else(|| CoreError::ConfigurationError(err_str.into()))?;
+        //
+        //     let db_name = db_name.next().expect(err_str).to_owned();
+        //
+        //     Ok(db_name)
+        // }
+        p if POSTGRES.is_provider(p) => {
             let url = Url::parse(url)?;
             let params: HashMap<String, String> = url.query_pairs().into_owned().collect();
 
@@ -63,29 +63,29 @@ pub fn db_name(source: &Datasource, url: &str) -> crate::Result<String> {
 
             Ok(db_name)
         }
-        p if MSSQL.is_provider(p) => {
-            let mut conn = JdbcString::from_str(&format!("jdbc:{}", url))?;
-            let db_name = conn
-                .properties_mut()
-                .remove("schema")
-                .unwrap_or_else(|| String::from("dbo"));
-
-            Ok(db_name)
-        }
-        #[cfg(feature = "mongodb")]
-        p if MONGODB.is_provider(p) => {
-            let url: MongoConnectionString = url.parse().map_err(|e: mongodb_client::Error| match &e.kind {
-                mongodb_client::ErrorKind::InvalidArgument { message } => {
-                    CoreError::ConfigurationError(format!("Error parsing connection string: {}", message))
-                }
-                _ => {
-                    let kind = connector::error::ErrorKind::ConnectionError(e.into());
-                    CoreError::ConnectorError(connector::error::ConnectorError::from_kind(kind))
-                }
-            })?;
-
-            Ok(url.database)
-        }
+        // p if MSSQL.is_provider(p) => {
+        //     let mut conn = JdbcString::from_str(&format!("jdbc:{}", url))?;
+        //     let db_name = conn
+        //         .properties_mut()
+        //         .remove("schema")
+        //         .unwrap_or_else(|| String::from("dbo"));
+        //
+        //     Ok(db_name)
+        // }
+        // #[cfg(feature = "mongodb")]
+        // p if MONGODB.is_provider(p) => {
+        //     let url: MongoConnectionString = url.parse().map_err(|e: mongodb_client::Error| match &e.kind {
+        //         mongodb_client::ErrorKind::InvalidArgument { message } => {
+        //             CoreError::ConfigurationError(format!("Error parsing connection string: {}", message))
+        //         }
+        //         _ => {
+        //             let kind = connector::error::ErrorKind::ConnectionError(e.into());
+        //             CoreError::ConnectorError(connector::error::ConnectorError::from_kind(kind))
+        //         }
+        //     })?;
+        //
+        //     Ok(url.database)
+        // }
         x => Err(CoreError::ConfigurationError(format!(
             "Unsupported connector type: {}",
             x

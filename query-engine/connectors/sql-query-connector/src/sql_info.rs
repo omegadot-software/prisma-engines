@@ -25,10 +25,10 @@ fn get_batch_size(_: usize) -> Option<usize> {
 }
 
 pub enum SqlFamily {
-    SQLite,
+    // SQLite,
     Postgres,
-    MySQL,
-    MSSQL,
+    // MySQL,
+    // MSSQL,
 }
 
 /// Contains meta information about the loaded connector.
@@ -54,24 +54,24 @@ impl SqlInfo {
         self.capabilities.contains(capability)
     }
 
-    fn sqlite() -> Self {
-        Self {
-            family: SqlFamily::SQLite,
-            max_rows: Some(999),
-            max_bind_values: get_batch_size(999),
-            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::SQLITE.capabilities().to_owned()),
-        }
-    }
-
-    fn mysql() -> Self {
-        Self {
-            family: SqlFamily::MySQL,
-            max_rows: None,
-            // See https://stackoverflow.com/a/11131824/788562
-            max_bind_values: get_batch_size(65535),
-            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MYSQL.capabilities().to_owned()),
-        }
-    }
+    // fn sqlite() -> Self {
+    //     Self {
+    //         family: SqlFamily::SQLite,
+    //         max_rows: Some(999),
+    //         max_bind_values: get_batch_size(999),
+    //         capabilities: ConnectorCapabilities::new(psl::builtin_connectors::SQLITE.capabilities().to_owned()),
+    //     }
+    // }
+    //
+    // fn mysql() -> Self {
+    //     Self {
+    //         family: SqlFamily::MySQL,
+    //         max_rows: None,
+    //         // See https://stackoverflow.com/a/11131824/788562
+    //         max_bind_values: get_batch_size(65535),
+    //         capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MYSQL.capabilities().to_owned()),
+    //     }
+    // }
 
     fn postgres() -> Self {
         Self {
@@ -82,24 +82,25 @@ impl SqlInfo {
         }
     }
 
-    fn mssql() -> Self {
-        Self {
-            family: SqlFamily::MSSQL,
-            max_rows: Some(1000),
-            max_bind_values: get_batch_size(2099),
-            capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MSSQL.capabilities().to_owned()),
-        }
-    }
+    // fn mssql() -> Self {
+    //     Self {
+    //         family: SqlFamily::MSSQL,
+    //         max_rows: Some(1000),
+    //         max_bind_values: get_batch_size(2099),
+    //         capabilities: ConnectorCapabilities::new(psl::builtin_connectors::MSSQL.capabilities().to_owned()),
+    //     }
+    // }
 }
 
 impl From<&ConnectionInfo> for SqlInfo {
     fn from(ci: &ConnectionInfo) -> Self {
         match ci {
-            ConnectionInfo::Postgres(_) => Self::postgres(),
-            ConnectionInfo::Mysql(_) => Self::mysql(),
-            ConnectionInfo::Mssql(_) => Self::mssql(),
-            ConnectionInfo::Sqlite { .. } => Self::sqlite(),
-            ConnectionInfo::InMemorySqlite { .. } => Self::sqlite(),
+            _ => Self::postgres(),
+            // ConnectionInfo::Postgres(_) => Self::postgres(),
+            // ConnectionInfo::Mysql(_) => Self::mysql(),
+            // ConnectionInfo::Mssql(_) => Self::mssql(),
+            // ConnectionInfo::Sqlite { .. } => Self::sqlite(),
+            // ConnectionInfo::InMemorySqlite { .. } => Self::sqlite(),
         }
     }
 }
