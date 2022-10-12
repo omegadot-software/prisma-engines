@@ -9,6 +9,7 @@ jobs:
     steps:
          - name: Build query-engine-node-api
            run: |
+             rustup default stable
              cargo build --release -p query-engine-node-api
          - name: List Target
            run: |
