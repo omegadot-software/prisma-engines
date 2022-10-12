@@ -1,18 +1,15 @@
 use super::{interpreting_executor::InterpretingExecutor, QueryExecutor};
 use crate::CoreError;
-use connection_string::JdbcString;
 use connector::Connector;
-use mongodb_client::MongoConnectionString;
 use psl::{builtin_connectors::*, common::preview_features::PreviewFeature, Datasource};
 use sql_connector::*;
 use std::collections::HashMap;
-use std::str::FromStr;
 use url::Url;
 
-#[cfg(feature = "mongodb")]
-use mongodb_connector::MongoDb;
+// #[cfg(feature = "mongodb")]
+// use mongodb_connector::MongoDb;
 
-const DEFAULT_SQLITE_DB_NAME: &str = "main";
+// const DEFAULT_SQLITE_DB_NAME: &str = "main";
 
 /// Loads a query executor based on the parsed Prisma schema (datasource).
 pub async fn load(
@@ -93,20 +90,20 @@ pub fn db_name(source: &Datasource, url: &str) -> crate::Result<String> {
     }
 }
 
-async fn sqlite(
-    source: &Datasource,
-    url: &str,
-    features: &[PreviewFeature],
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading SQLite query connector...");
-
-    let sqlite = Sqlite::from_source(source, url, features).await?;
-
-    let db_name = db_name(source, url)?;
-
-    trace!("Loaded SQLite query connector.");
-    Ok((db_name, sql_executor(sqlite, false)))
-}
+// async fn sqlite(
+//     source: &Datasource,
+//     url: &str,
+//     features: &[PreviewFeature],
+// ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+//     trace!("Loading SQLite query connector...");
+//
+//     let sqlite = Sqlite::from_source(source, url, features).await?;
+//
+//     let db_name = db_name(source, url)?;
+//
+//     trace!("Loaded SQLite query connector.");
+//     Ok((db_name, sql_executor(sqlite, false)))
+// }
 
 async fn postgres(
     source: &Datasource,
@@ -132,35 +129,35 @@ async fn postgres(
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
-async fn mysql(
-    source: &Datasource,
-    url: &str,
-    features: &[PreviewFeature],
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading MySQL query connector...");
-
-    let mysql = Mysql::from_source(source, url, features).await?;
-
-    let db_name = db_name(source, url)?;
-
-    trace!("Loaded MySQL query connector.");
-    Ok((db_name, sql_executor(mysql, false)))
-}
-
-async fn mssql(
-    source: &Datasource,
-    url: &str,
-    features: &[PreviewFeature],
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading SQL Server query connector...");
-
-    let mssql = Mssql::from_source(source, url, features).await?;
-
-    let db_name = db_name(source, url)?;
-
-    trace!("Loaded SQL Server query connector.");
-    Ok((db_name, sql_executor(mssql, false)))
-}
+// async fn mysql(
+//     source: &Datasource,
+//     url: &str,
+//     features: &[PreviewFeature],
+// ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+//     trace!("Loading MySQL query connector...");
+//
+//     let mysql = Mysql::from_source(source, url, features).await?;
+//
+//     let db_name = db_name(source, url)?;
+//
+//     trace!("Loaded MySQL query connector.");
+//     Ok((db_name, sql_executor(mysql, false)))
+// }
+//
+// async fn mssql(
+//     source: &Datasource,
+//     url: &str,
+//     features: &[PreviewFeature],
+// ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+//     trace!("Loading SQL Server query connector...");
+//
+//     let mssql = Mssql::from_source(source, url, features).await?;
+//
+//     let db_name = db_name(source, url)?;
+//
+//     trace!("Loaded SQL Server query connector.");
+//     Ok((db_name, sql_executor(mssql, false)))
+// }
 
 fn sql_executor<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync>
 where
@@ -169,17 +166,17 @@ where
     Box::new(InterpretingExecutor::new(connector, force_transactions))
 }
 
-#[cfg(feature = "mongodb")]
-async fn mongodb(
-    source: &Datasource,
-    url: &str,
-    _features: &[PreviewFeature],
-) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
-    trace!("Loading MongoDB query connector...");
-
-    let mongo = MongoDb::new(source, url).await?;
-    let db_name = db_name(source, url)?;
-
-    trace!("Loaded MongoDB query connector.");
-    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
-}
+// #[cfg(feature = "mongodb")]
+// async fn mongodb(
+//     source: &Datasource,
+//     url: &str,
+//     _features: &[PreviewFeature],
+// ) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
+//     trace!("Loading MongoDB query connector...");
+//
+//     let mongo = MongoDb::new(source, url).await?;
+//     let db_name = db_name(source, url)?;
+//
+//     trace!("Loaded MongoDB query connector.");
+//     Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
+// }
